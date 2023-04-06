@@ -1,31 +1,24 @@
 #!/usr/bin/env bash
+# A Script that displays information and subdomains
 
-function Get_record() {
-    domain=$1
-    subdomain=$2
-    record_Type=$3
-    dig +short $subdomain.$domain $record_Type | awk '{ print $1 }'
+display_() {
+  local domain="$1"
+  local subdomain="$2"
+  local record_type=$(dig +short "$subdomain.$domain" | awk '{print $4}')
+  local destination=$(dig +short "$subdomain.$domain" | awk '{print $5}')
+
+  printf "The subdomain %s is a %s record and points to %s\n" "$subdomain" "$record_type" "$destination"
 }
 
-domain=$1
-subdomain=$2
+domain="$1"
+subdomain="$2"
 
-if [ -z "$subdomain" ]; then
-    subdomains=("www" "lb-01" "web-01" "web-02")
+if [[ -z "$subdomain" ]]; then
+  subdomains=(www lb-01 web-01 web-02)
 else
-    subdomains=("$subdomain")
+  subdomains=("$subdomain")
 fi
 
-i=0
-while [ $i -lt ${#subdomains[@]} ]
-do
-    subdomain=${subdomains[$i]}
-    ip=$(Get_record $domain $subdomain A)
-    if [ -z "$ip" ]; then
-        ((i++))
-        continue
-    fi
-    echo "The subdomain $subdomain is a A record and points to $ip"
-    ((i++))
+for sub in "${subdomains[@]}"; do
+  display_info "$domain" "$sub"
 done
-
