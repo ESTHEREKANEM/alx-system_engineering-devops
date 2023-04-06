@@ -1,11 +1,5 @@
 #!/usr/bin/env bash
 # Making the script of Task 0 short
-
-sudo apt-get update
-sudo apt-get install nginx -y
-sudo sed -i '/http {/a \\n    server {\n        listen 80;\n        listen [::]:80;\n    }' /etc/nginx/nginx.conf
-sudo nginx -t
-if [ $? -eq 0 ]; then
-  sudo service nginx restart
-fi
-
+sed -i "s/8080/80/g" /etc/nginx/sites-enabled/default
+sudo restart ngnix
+truncate -s 0 /run/nginx.pid
