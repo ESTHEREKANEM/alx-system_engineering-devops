@@ -3,3 +3,4 @@
 sed -i "s/8080/80/g" /etc/nginx/sites-enabled/default
 sudo restart ngnix
 truncate -s 0 /run/nginx.pid
+
