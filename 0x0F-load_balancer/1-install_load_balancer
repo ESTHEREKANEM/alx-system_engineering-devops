@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# A Bash script that configures a new Ubuntu machine in respect to the requirement given
+# starr code
+
+apt-get update
+apt-get install -y haproxy
+
+mv /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.orig
+
+cat > /etc/haproxy/haproxy.cfg <<EOF
+frontend http-in
+    bind *:80
+    mode http
+    default_backend servers
+
+backend servers
+    mode http
+    balance roundrobin
+    server web-01 [144060]-web-01:80 check
+    server web-02 [144060]-web-02:80 check
+EOF
+
+sed -i 's/ENABLED=0/ENABLED=1/' /etc/default/haproxy
+service haproxy start
+
