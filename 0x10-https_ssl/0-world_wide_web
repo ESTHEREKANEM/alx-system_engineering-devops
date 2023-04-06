@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+function Get_record() {
+    domain=$1
+    subdomain=$2
+    record_Type=$3
+    dig +short $subdomain.$domain $record_Type | awk '{ print $1 }'
+}
+
+domain=$1
+subdomain=$2
+
+if [ -z "$subdomain" ]; then
+    subdomains=("www" "lb-01" "web-01" "web-02")
+else
+    subdomains=("$subdomain")
+fi
+
+i=0
+while [ $i -lt ${#subdomains[@]} ]
+do
+    subdomain=${subdomains[$i]}
+    ip=$(Get_record $domain $subdomain A)
+    if [ -z "$ip" ]; then
+        ((i++))
+        continue
+    fi
+    echo "The subdomain $subdomain is a A record and points to $ip"
+    ((i++))
+done
+
