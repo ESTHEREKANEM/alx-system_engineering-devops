@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # A Script that displays information and subdomains
-
+# shellcheck case SC2086 ignored
 show_subdomain_info() {
     domain="$1"
     subdomain="$2"
@@ -10,25 +10,20 @@ show_subdomain_info() {
     printf "The subdomain %s is a %s record and points to %s\n" "$subdomain" "$record_type" "$ip_address"
 }
 
-# Check if domain argument is provided
 if [ -z "$1" ]; then
     echo "Please provide a domain name as the first argument"
     exit 1
 fi
 
-# Check if subdomain argument is provided and valid
 if [ -n "$2" ] && ! [[ "$2" =~ ^(www|lb-01|web-01|web-02)$ ]]; then
     echo "Invalid subdomain name. Allowed values are: www, lb-01, web-01, web-02"
     exit 1
 fi
 
-# If subdomain argument is provided, show information for that subdomain only
 if [ -n "$2" ]; then
     show_subdomain_info "$1" "$2"
-# Otherwise, show information for all subdomains
 else
     for subdomain in www lb-01 web-01 web-02; do
         show_subdomain_info "$1" "$subdomain"
     done
 fi
-
