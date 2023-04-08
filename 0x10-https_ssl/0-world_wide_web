@@ -1,28 +1,20 @@
 #!/usr/bin/env bash
 # A Script that displays information and subdomains
 # shellcheck case SC2086 ignored
-
 show_subdomain_info() {
     domain="$1"
     subdomain="$2"
-    dig_output=$(dig "$subdomain.$domain" +short)
-
-    if [ -z "$dig_output" ]; then
-        printf "The subdomain %s does not exist\n" "$subdomain"
-    else
-        record_type=$(echo "$dig_output" | awk '/^.*\s.*\s.*\s.*$/ {print $4}')
-        ip_address=$(echo "$dig_output" | awk '{print $1}')
-        printf "The subdomain %s is a %s record and points to %s\n" "$subdomain" "$record_type" "$ip_address"
-    fi
+    dig_output="$(dig "$subdomain.$domain")"
+    record_type="$(echo "$dig_output" | awk '/ANSWER SECTION:/{getline; print $4}')"
+    ip_address="$(echo "$dig_output" | awk '/ANSWER SECTION:/{getline; print $5}')"
+    printf "The subdomain %s is a %s record and points to %s\n" "$subdomain" "$record_type" "$ip_address"
 }
 
-# Check if the domain name is provided as the first argument
 if [ -z "$1" ]; then
     echo "Please provide a domain name as the first argument"
     exit 1
 fi
 
-# If a subdomain is provided as the second argument, display its information
 if [ -n "$2" ] && ! [[ "$2" =~ ^(www|lb-01|web-01|web-02)$ ]]; then
     echo "Invalid subdomain name. Allowed values are: www, lb-01, web-01, web-02"
     exit 1
@@ -31,7 +23,6 @@ fi
 if [ -n "$2" ]; then
     show_subdomain_info "$1" "$2"
 else
-    # If no subdomain is provided, display information for all subdomains
     for subdomain in www lb-01 web-01 web-02; do
         show_subdomain_info "$1" "$subdomain"
     done
