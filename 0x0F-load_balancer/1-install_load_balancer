@@ -2,24 +2,25 @@
 # A Bash script that configures a new Ubuntu machine in respect to the requirement given
 # starr code
 
-apt-get update
-apt-get install -y haproxy
+sudo apt-get -y update
+apt-get -y install haproxy
 
-mv /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.orig
+# edit config file
+server_config=\
+"
+frontend  starr-frontend
+        bind *:80
+        mode http
+        default_backend starr-backend
+backend starr-backend
+        balance roundrobin
+        server 144060-web-01 54.146.79.137:80 check
+        server 144060-web-02 54.152.191.29:80 check
+"
+echo "$server_config" | sudo tee -a /etc/haproxy/haproxy.cfg
 
-cat > /etc/haproxy/haproxy.cfg <<EOF
-frontend http-in
-    bind *:80
-    mode http
-    default_backend servers
+# enable haproxy to be started by init script
 
-backend servers
-    mode http
-    balance roundrobin
-    server web-01 [144060]-web-01:80 check
-    server web-02 [144060]-web-02:80 check
-EOF
+echo "ENABLED=1" | sudo tee -a /etc/default/haproxy
 
-sed -i 's/ENABLED=0/ENABLED=1/' /etc/default/haproxy
-service haproxy start
-
+sudo service haproxy restart
