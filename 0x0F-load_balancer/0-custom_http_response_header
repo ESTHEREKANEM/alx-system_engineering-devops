@@ -1,14 +1,30 @@
 #!/usr/bin/env bash
 # We are to Configure nginix so  so that its HTTP response contains a custom header (on web-01 and web-02)
 
-sudo apt update
-sudo apt install nginx
+sudo apt-update
+sudo apt-get -y install nginx
 
-header_name = X-Served-By
-server_name = $144060-web-01
+# This configures firewall to allow request through port 80
+sudo ufw allow 'Nginx HTTP'
 
-echo "add_header ${header_name} ${server_name};" | sudo tee -a /etc/nginx/nginx.conf > /dev/null
+sudo mkdir -p /var/www/html
 
-sudo nginx -t
+# This changes permissions to allow us to easily create files in this directory
+sudo chmod -R 755 /var/www
 
-sudo systemctl reload nginx
+# create index page
+echo 'Hello World!' |sudo tee  /var/www/html/index.html
+
+# create a webpage for error 404
+echo "Ceci n'est pas une page" |sudo tee /var/www/html/404_page.html
+
+# code to configure redirect for a single page(/redirect_me) and add header to display hostname
+string_for_replacement="server_name _;\n\tadd_header X-Served-By \$hostname;\n\trewrite ^\/redirect_me https:\/\/www.youtube.com/watch?v=QH2-TGUlwu4
+sudo sed -i "s/server_name _;/$string_for_replacement/" /etc/nginx/sites-enabled/default
+
+# code to configure redirect for 404 error page
+string_for_replacement="listen 80 default_server;\n\terror_page 404 \/404_page.html;\n\tlocation = \/404_page.html {\n\t\troot \/var\/www\/html;\n\t\tinternal;\n\t}"
+sudo sed -i "s/listen 80 default_server;/$string_for_replacement/" /etc/nginx/sites-enabled/default
+
+# restart the web server after updating the settings
+sudo service nginx restart
