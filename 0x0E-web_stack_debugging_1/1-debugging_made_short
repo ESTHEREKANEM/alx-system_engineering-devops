@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 # Making the script of Task 0 short
 ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
-sudo service ngnix start
+sudo service nginx start
 rm /run/nginx.pid
