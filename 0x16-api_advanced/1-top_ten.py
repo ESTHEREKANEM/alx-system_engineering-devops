@@ -10,10 +10,10 @@ def top_ten(subreddit):
     of the first 10 hot posts listed for a given subreddit.
     """
     url = "https://www.reddit.com/r/{}/hot.json".format(subreddit)
-    headers = {"User-Agent": "MyRedditAPI/1.0"}
+    headers = {"User-Agent": "MyRedditAPI_project"}
     params = {"limit": 10}
 
-    response = requests.get(url, headers=headers, params=params)
+    response = requests.get(url, headers=headers, params=params, allow_redirects=False)
 
     if response.status_code == 200:
         data = response.json()
