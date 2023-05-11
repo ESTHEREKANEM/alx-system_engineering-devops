@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-""A function that print hot posts on a given Reddit subreddit."""
+"""A function that print hot posts on a given Reddit subreddit."""
 import requests
 
 
